@@ -26,8 +26,8 @@
             android:name="com.example.android.firebaseui_login_sample.MainFragment"
             android:label="MainFragment">
         <action
-            android:id="@+id/action_mainFragment_to_settingsFragment"
-            app:destination="@+id/settingsFragment"/>
+            android:id="@+id/action_mainFragment_to_accountSettingsFragment"
+            app:destination="@+id/accountSettingsFragment"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"
@@ -39,4 +39,9 @@
             android:name="com.example.android.firebaseui_login_sample.LoginFragment"
             android:label="fragment_login"
             tools:layout="@layout/fragment_login"/>
+    <fragment
+        android:id="@+id/accountSettingsFragment"
+        android:name="com.example.android.firebaseui_login_sample.AccountSettingsFragment"
+        android:label="fragment_account_settings"
+        tools:layout="@layout/fragment_account_settings"/>
 </navigation>

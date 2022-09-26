@@ -64,7 +64,7 @@ class MainFragment : Fragment() {
         binding.authButton.setOnClickListener { launchSignInFlow()
         }
         binding.settingsBtn.setOnClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToSettingsFragment()
+            val action = MainFragmentDirections.actionMainFragmentToAccountSettingsFragment()
             findNavController().navigate(action)
         }
     }
