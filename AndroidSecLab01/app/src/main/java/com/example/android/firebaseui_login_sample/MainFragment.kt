@@ -61,8 +61,7 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeAuthenticationState()
 
-        binding.authButton.setOnClickListener { launchSignInFlow()
-        }
+        binding.authButton.setOnClickListener { launchSignInFlow() }
         binding.settingsBtn.setOnClickListener {
             val action = MainFragmentDirections.actionMainFragmentToAccountSettingsFragment()
             findNavController().navigate(action)

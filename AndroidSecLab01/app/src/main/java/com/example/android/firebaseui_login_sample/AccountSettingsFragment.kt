@@ -31,16 +31,34 @@ class AccountSettingsFragment : Fragment() {
     // Get a reference to the ViewModel scoped to this Fragment.
     private val viewModel by viewModels<LoginViewModel>()
 
+    private lateinit var binding: FragmentAccountSettingsBinding
+
     private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment.
-        val binding = DataBindingUtil.inflate<FragmentAccountSettingsBinding>(
+        binding = DataBindingUtil.inflate<FragmentAccountSettingsBinding>(
             inflater, R.layout.fragment_account_settings, container, false
         )
-        binding.avatarImageView.setImageURI(FirebaseAuth.getInstance().currentUser?.photoUrl)
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        binding.avatarImageView.setImageURI(currentUser?.photoUrl)
+        binding.editTextTextPersonName.setText(currentUser?.displayName)
+        binding.editTextTextEmailAddress.setText(currentUser?.email)
+        binding.authMethodTextView.setText(currentUser?.providerId)
+        binding.changeAvatarButton.setOnClickListener{ changeAvatar() }
+        binding.saveAccountSettingsButton.setOnClickListener{ saveChanges() }
+        binding.DeleteAccountButton.setOnClickListener {
+            val user = FirebaseAuth.getInstance().currentUser!!
+
+            user.delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "User account deleted.")
+                    }
+                }
+        }
         //binding.authButton.setOnClickListener { launchSignInFlow() }
 
         return binding.root
@@ -62,5 +80,12 @@ class AccountSettingsFragment : Fragment() {
                 )
             }
         })
+    }
+    private fun changeAvatar(){
+
+    }
+
+    private fun saveChanges(){
+
     }
 }
