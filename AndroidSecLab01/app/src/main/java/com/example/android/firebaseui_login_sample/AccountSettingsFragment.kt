@@ -2,6 +2,7 @@ package com.example.android.firebaseui_login_sample
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -16,11 +17,11 @@ import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.android.firebaseui_login_sample.databinding.FragmentAccountSettingsBinding
-import com.example.android.firebaseui_login_sample.databinding.FragmentLoginBinding
-import com.example.android.firebaseui_login_sample.databinding.FragmentMainBinding
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import android.provider.MediaStore
 
 class AccountSettingsFragment : Fragment() {
 
@@ -32,6 +33,9 @@ class AccountSettingsFragment : Fragment() {
     private val viewModel by viewModels<LoginViewModel>()
 
     private lateinit var binding: FragmentAccountSettingsBinding
+
+    private val pickImage = 100
+    private var imageUri: Uri? = null
 
     private lateinit var navController: NavController
 
@@ -60,6 +64,7 @@ class AccountSettingsFragment : Fragment() {
                 }
         }
         //binding.authButton.setOnClickListener { launchSignInFlow() }
+        imageUri = null
 
         return binding.root
     }
@@ -82,10 +87,39 @@ class AccountSettingsFragment : Fragment() {
         })
     }
     private fun changeAvatar(){
+        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        startActivityForResult(gallery, pickImage)
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data
+            binding.avatarImageView.setImageURI(imageUri)
+        }
     }
 
     private fun saveChanges(){
+        val user = FirebaseAuth.getInstance().currentUser
+
+        //TODO: Update image
+        if (user?.displayName != binding.editTextTextPersonName.text.toString() || imageUri != null) {
+            val profileUpdates = UserProfileChangeRequest.Builder().apply {
+                if (user?.displayName != binding.editTextTextPersonName.text.toString())
+                    setDisplayName(binding.editTextTextPersonName.text.toString())
+                if (imageUri != null)
+                    setPhotoUri(imageUri)
+            }.build()
+            user!!.updateProfile(profileUpdates)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "User profile updated.")
+                    }
+                }
+        }
+        if (user?.email != binding.editTextTextEmailAddress.text.toString().trim())
+            user!!.updateEmail(binding.editTextTextEmailAddress.text.toString().trim())
+
 
     }
 }
