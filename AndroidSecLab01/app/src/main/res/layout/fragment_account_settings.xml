@@ -15,13 +15,14 @@
             android:layout_height="wrap_content"
             android:src="@drawable/fui_ic_anonymous_white_24dp" />
 
-        <Button
-            android:id="@+id/changeAvatarButton"
+
+        <EditText
+            android:id="@+id/editTextAvatarURL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Change avatar" />
-
-
+            android:ems="10"
+            android:inputType="textUri"
+            android:text="Avatar URL" />
 
         <EditText
             android:id="@+id/editTextTextPersonName"

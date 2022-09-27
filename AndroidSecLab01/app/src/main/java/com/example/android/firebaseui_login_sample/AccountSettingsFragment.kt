@@ -2,6 +2,8 @@ package com.example.android.firebaseui_login_sample
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -22,6 +24,13 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import android.provider.MediaStore
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import java.io.IOException
+import java.net.URL
 
 class AccountSettingsFragment : Fragment() {
 
@@ -47,11 +56,23 @@ class AccountSettingsFragment : Fragment() {
             inflater, R.layout.fragment_account_settings, container, false
         )
         val currentUser = FirebaseAuth.getInstance().currentUser
-        binding.avatarImageView.setImageURI(currentUser?.photoUrl)
+        if(currentUser?.photoUrl != null) {
+            val url = URL(currentUser?.photoUrl.toString())
+            //val bitmap = BitmapFactory.decodeStream( url.openConnection().getInputStream())
+            //binding.avatarImageView.setImageBitmap( bitmap )
+
+            val result: Deferred<Bitmap?> = lifecycleScope.async(Dispatchers.IO) {
+                url.toBitmap
+            }
+            lifecycleScope.launch(Dispatchers.Main) {
+                // show bitmap on image view when available
+                binding.avatarImageView.setImageBitmap(result.await())
+            }
+        }
         binding.editTextTextPersonName.setText(currentUser?.displayName)
         binding.editTextTextEmailAddress.setText(currentUser?.email)
-        binding.authMethodTextView.setText(currentUser?.providerId)
-        binding.changeAvatarButton.setOnClickListener{ changeAvatar() }
+        binding.authMethodTextView.setText(currentUser?.providerData?.get(1)?.providerId ?:"" )
+        binding.editTextAvatarURL.setText(currentUser?.photoUrl.toString())
         binding.saveAccountSettingsButton.setOnClickListener{ saveChanges() }
         binding.DeleteAccountButton.setOnClickListener {
             val user = FirebaseAuth.getInstance().currentUser!!
@@ -62,6 +83,7 @@ class AccountSettingsFragment : Fragment() {
                         Log.d(TAG, "User account deleted.")
                     }
                 }
+            AuthUI.getInstance().signOut(requireContext())
         }
         //binding.authButton.setOnClickListener { launchSignInFlow() }
         imageUri = null
@@ -86,10 +108,6 @@ class AccountSettingsFragment : Fragment() {
             }
         })
     }
-    private fun changeAvatar(){
-        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        startActivityForResult(gallery, pickImage)
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -103,12 +121,12 @@ class AccountSettingsFragment : Fragment() {
         val user = FirebaseAuth.getInstance().currentUser
 
         //TODO: Update image
-        if (user?.displayName != binding.editTextTextPersonName.text.toString() || imageUri != null) {
+        if (user?.displayName != binding.editTextTextPersonName.text.toString() || user?.photoUrl.toString() != binding.editTextAvatarURL.text.toString()) {
             val profileUpdates = UserProfileChangeRequest.Builder().apply {
                 if (user?.displayName != binding.editTextTextPersonName.text.toString())
                     setDisplayName(binding.editTextTextPersonName.text.toString())
-                if (imageUri != null)
-                    setPhotoUri(imageUri)
+                if (user?.photoUrl.toString() != binding.editTextAvatarURL.text.toString())
+                    setPhotoUri(Uri.parse(binding.editTextAvatarURL.text.toString()))
             }.build()
             user!!.updateProfile(profileUpdates)
                 .addOnCompleteListener { task ->
@@ -119,7 +137,11 @@ class AccountSettingsFragment : Fragment() {
         }
         if (user?.email != binding.editTextTextEmailAddress.text.toString().trim())
             user!!.updateEmail(binding.editTextTextEmailAddress.text.toString().trim())
-
-
     }
+    private val URL.toBitmap: Bitmap?
+        get() {
+            return try {
+                BitmapFactory.decodeStream(openStream())
+            }catch (e: IOException){null}
+        }
 }
