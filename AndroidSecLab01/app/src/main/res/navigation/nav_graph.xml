@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_mainFragment_to_accountSettingsFragment"
             app:destination="@+id/accountSettingsFragment"/>
+        <action
+            android:id="@+id/action_mainFragment_to_someProtectedFragment"
+            app:destination="@+id/someProtectedFragment"/>
     </fragment>
     <fragment
             android:id="@+id/settingsFragment"
@@ -44,4 +47,9 @@
         android:name="com.example.android.firebaseui_login_sample.AccountSettingsFragment"
         android:label="fragment_account_settings"
         tools:layout="@layout/fragment_account_settings"/>
+    <fragment
+        android:id="@+id/someProtectedFragment"
+        android:name="com.example.android.firebaseui_login_sample.SomeProtectedFragment"
+        android:label="fragment_some_protected"
+        tools:layout="@layout/fragment_some_protected"/>
 </navigation>

@@ -66,6 +66,10 @@ class MainFragment : Fragment() {
             val action = MainFragmentDirections.actionMainFragmentToAccountSettingsFragment()
             findNavController().navigate(action)
         }
+        binding.somepBtn.setOnClickListener {
+            val action = MainFragmentDirections.actionMainFragmentToSomeProtectedFragment()
+            findNavController().navigate(action)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
