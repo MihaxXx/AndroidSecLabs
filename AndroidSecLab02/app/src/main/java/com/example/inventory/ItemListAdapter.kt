@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.inventory.data.Item
 import com.example.inventory.data.getFormattedPrice
-import com.example.inventory.databinding.ItemListFragmentBinding
 import com.example.inventory.databinding.ItemListItemBinding
 
 class ItemListAdapter(private val onItemClicked: (Item) -> Unit):

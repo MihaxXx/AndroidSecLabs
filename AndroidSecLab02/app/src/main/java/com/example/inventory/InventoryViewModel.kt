@@ -1,6 +1,5 @@
 package com.example.inventory
 
-import android.provider.ContactsContract.CommonDataKinds.Email
 import android.text.TextUtils
 import android.util.Patterns
 import androidx.lifecycle.*
@@ -41,11 +40,11 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
         }
         return true
     }
-    private fun isValidEmail(target: CharSequence?): Boolean {
+    private fun isValidEmail(target: CharSequence): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
     }
 
-    private fun isValidPhone(target: CharSequence?): Boolean {
+    private fun isValidPhone(target: CharSequence): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.PHONE.matcher(target).matches()
     }
 
