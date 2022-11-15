@@ -22,7 +22,7 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
     private fun getNewItemEntry(itemName: String, itemPrice: String, itemCount: String, providerName: String, providerEmail: String, providerPhone: String): Item {
         return Item(
             itemName = itemName,
-            itemPrice = itemPrice.toDouble(),
+            itemPrice = NumberFormat.getInstance().parse(itemPrice)!!.toDouble(),
             quantityInStock = itemCount.toInt(),
             providerName = providerName,
             providerEmail = providerEmail,
@@ -84,11 +84,10 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
         providerEmail: String,
         providerPhone: String
     ): Item {
-        val nf = NumberFormat.getInstance()
         return Item(
             id = itemId,
             itemName = itemName,
-            itemPrice = nf.parse(itemPrice)!!.toDouble(),
+            itemPrice = NumberFormat.getInstance().parse(itemPrice)!!.toDouble(),
             quantityInStock = itemCount.toInt(),
             providerName = providerName,
             providerEmail = providerEmail,

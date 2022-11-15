@@ -17,6 +17,7 @@ package com.example.inventory
 
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.text.method.DigitsKeyListener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.inventory.data.Item
 import com.example.inventory.databinding.FragmentAddItemBinding
+import java.text.DecimalFormatSymbols
+
 
 /**
  * Fragment to add or update an item in the Inventory database.
@@ -124,6 +127,8 @@ class AddItemFragment : Fragment() {
                     addNewItem()
                 }
             }
+        val separator: Char = DecimalFormatSymbols.getInstance().decimalSeparator
+        binding.itemPrice.keyListener = DigitsKeyListener.getInstance("0123456789$separator")
     }
 
     private fun updateItem() {
