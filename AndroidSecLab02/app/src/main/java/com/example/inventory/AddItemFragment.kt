@@ -138,7 +138,7 @@ class AddItemFragment : Fragment() {
                 this.binding.providerPhone.text.toString()
             )
             val action = AddItemFragmentDirections.actionAddItemFragmentToItemListFragment()
-            findNavController().navigate(action)
+            findNavController().popBackStack()//.navigate(action)
         }
     }
 }
