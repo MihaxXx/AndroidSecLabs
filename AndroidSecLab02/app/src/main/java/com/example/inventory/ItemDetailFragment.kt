@@ -17,6 +17,7 @@
 package com.example.inventory
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -115,6 +116,22 @@ class ItemDetailFragment : Fragment() {
             sellItem.setOnClickListener { viewModel.sellItem(item) }
             deleteItem.setOnClickListener { showConfirmationDialog() }
             editItem.setOnClickListener { editItem() }
+            shareItem.setOnClickListener { share() }
         }
+    }
+    /**
+     * Emits a sample share [Intent].
+     */
+    private fun share() {
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.type = "text/plain"
+        val itemText = "Name: ${item.itemName}\n" +
+                "Price: ${item.getFormattedPrice()}\n" +
+                "${getString(R.string.quantity)} ${item.quantityInStock}\n" +
+                "${getString(R.string.provider)} ${item.providerName}\n" +
+                "${getString(R.string.provider_email)} ${item.providerEmail}\n" +
+                "${getString(R.string.provider_phone)} ${item.providerPhoneNumber}\n"
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, itemText)
+        startActivity(Intent.createChooser(sharingIntent, null))
     }
 }

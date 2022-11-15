@@ -40,4 +40,5 @@
     <string name="provider_req">Provider <font color='#FF0000'>*</font></string>
     <string name="provider_email_req">Provider Email <font color='#FF0000'>*</font></string>
     <string name="provider_phone_req">Provider Phone <font color='#FF0000'>*</font></string>
+    <string name="share">Share</string>
 </resources>
