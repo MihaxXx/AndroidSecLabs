@@ -16,6 +16,7 @@
 package com.example.inventory
 
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.method.DigitsKeyListener
 import android.view.LayoutInflater
@@ -46,6 +47,8 @@ class AddItemFragment : Fragment() {
 
     lateinit var item: Item
 
+    lateinit var sharedPreferences: SharedPreferences
+
     private val navigationArgs: ItemDetailFragmentArgs by navArgs()
 
     // Binding object instance corresponding to the fragment_add_item.xml layout
@@ -60,6 +63,7 @@ class AddItemFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentAddItemBinding.inflate(inflater, container, false)
+        sharedPreferences = (activity as MainActivity).sharedPreferences
         return binding.root
     }
 
@@ -123,12 +127,21 @@ class AddItemFragment : Fragment() {
                     bind(item)
                 }
             } else {
+                substituteDefaultValues()
                 binding.saveAction.setOnClickListener {
                     addNewItem()
                 }
             }
         val separator: Char = DecimalFormatSymbols.getInstance().decimalSeparator
         binding.itemPrice.keyListener = DigitsKeyListener.getInstance("0123456789$separator")
+    }
+
+    private fun substituteDefaultValues() {
+        if (sharedPreferences.getBoolean("switchSubstituteDefaultValues",false)) binding.apply {
+            providerName.setText(sharedPreferences.getString("defaultProviderName",""), TextView.BufferType.SPANNABLE)
+            providerEmail.setText(sharedPreferences.getString("defaultProviderEmail",""), TextView.BufferType.SPANNABLE)
+            providerPhone.setText(sharedPreferences.getString("defaultProviderPhone",""), TextView.BufferType.SPANNABLE)
+        }
     }
 
     private fun updateItem() {

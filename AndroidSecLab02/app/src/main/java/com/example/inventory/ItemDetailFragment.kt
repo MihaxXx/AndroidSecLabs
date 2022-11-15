@@ -18,6 +18,7 @@ package com.example.inventory
 
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -47,12 +48,15 @@ class ItemDetailFragment : Fragment() {
 
     lateinit var item: Item
 
+    lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentItemDetailBinding.inflate(inflater, container, false)
+        sharedPreferences = (activity as MainActivity).sharedPreferences
         return binding.root
     }
 
@@ -103,15 +107,26 @@ class ItemDetailFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    private fun blurString(s: String): String {
+        return s.replaceRange(2 , s.length-3 , "*".repeat(s.length-5))
+    }
 
     private fun bind(item: Item) {
         binding.apply {
             itemName.text = item.itemName
             itemPrice.text = item.getFormattedPrice()
             itemCount.text = item.quantityInStock.toString()
-            providerName.text = item.providerName
-            providerEmail.text = item.providerEmail
-            providerPhone.text = item.providerPhoneNumber
+            if (sharedPreferences.getBoolean("switchHideSensitiveData",false)) {
+                providerName.text = blurString(item.providerName)
+                providerEmail.text = blurString(item.providerEmail)
+                providerPhone.text = blurString(item.providerPhoneNumber)
+            }
+            else {
+                providerName.text = item.providerName
+                providerEmail.text = item.providerEmail
+                providerPhone.text = item.providerPhoneNumber
+            }
+            shareItem.isEnabled = !sharedPreferences.getBoolean("switchForbidDataSharing",false)
             sellItem.isEnabled = viewModel.isStockAvailable(item)
             sellItem.setOnClickListener { viewModel.sellItem(item) }
             deleteItem.setOnClickListener { showConfirmationDialog() }
