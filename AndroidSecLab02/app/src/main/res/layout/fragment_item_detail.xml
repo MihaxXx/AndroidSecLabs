@@ -60,6 +60,69 @@
         app:layout_constraintTop_toBottomOf="@+id/item_price"
         tools:text="5" />
 
+    <TextView
+        android:id="@+id/provider_name_label"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="wrap_content"
+        android:text="@string/provider"
+        app:layout_constraintBaseline_toBaselineOf="@+id/provider_name"
+        app:layout_constraintEnd_toStartOf="@+id/provider_name"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/provider_name"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="0dp"
+        android:layout_marginStart="@dimen/margin_between_elements"
+        android:layout_marginTop="@dimen/margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/provider_name_label"
+        app:layout_constraintTop_toBottomOf="@+id/item_count_label"
+        tools:text="LLC 'Roga and Kopita'" />
+
+    <TextView
+        android:id="@+id/provider_email_label"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="wrap_content"
+        android:text="@string/provider_email"
+        app:layout_constraintBaseline_toBaselineOf="@+id/provider_email"
+        app:layout_constraintEnd_toStartOf="@+id/provider_email"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/provider_email"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="0dp"
+        android:layout_marginStart="@dimen/margin_between_elements"
+        android:layout_marginTop="@dimen/margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/provider_email_label"
+        app:layout_constraintTop_toBottomOf="@+id/provider_name"
+        tools:text="email@RogaAndKopita.com" />
+
+    <TextView
+        android:id="@+id/provider_phone_label"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="wrap_content"
+        android:text="@string/provider_phone"
+        app:layout_constraintBaseline_toBaselineOf="@+id/provider_phone"
+        app:layout_constraintEnd_toStartOf="@+id/provider_phone"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/provider_phone"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="0dp"
+        android:layout_marginStart="@dimen/margin_between_elements"
+        android:layout_marginTop="@dimen/margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/provider_phone_label"
+        app:layout_constraintTop_toBottomOf="@+id/provider_email"
+        tools:text="+1 555 75 35" />
+
     <Button
         android:id="@+id/sell_item"
         android:layout_width="0dp"
@@ -69,7 +132,7 @@
         app:layout_constraintBottom_toTopOf="@+id/delete_item"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/item_count" />
+        app:layout_constraintTop_toBottomOf="@+id/provider_phone" />
 
     <Button
         android:id="@+id/delete_item"

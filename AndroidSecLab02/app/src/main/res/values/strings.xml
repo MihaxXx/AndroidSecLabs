@@ -34,4 +34,10 @@
     <string name="currency_symbol">$</string>
     <string name="edit_item">Edit Item</string>
     <string name="add_new_item">Add new item</string>
+    <string name="provider">Provider:</string>
+    <string name="provider_email">Provider Email:</string>
+    <string name="provider_phone">Provider Phone:</string>
+    <string name="provider_req">Provider <font color='#FF0000'>*</font></string>
+    <string name="provider_email_req">Provider Email <font color='#FF0000'>*</font></string>
+    <string name="provider_phone_req">Provider Phone <font color='#FF0000'>*</font></string>
 </resources>

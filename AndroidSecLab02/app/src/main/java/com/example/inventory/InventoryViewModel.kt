@@ -1,11 +1,15 @@
 package com.example.inventory
 
+import android.provider.ContactsContract.CommonDataKinds.Email
+import android.text.TextUtils
+import android.util.Patterns
 import androidx.lifecycle.*
 import com.example.inventory.data.Item
 import com.example.inventory.data.ItemDao
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
+
 
 class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
     val allItems: LiveData<List<Item>> = itemDao.getItems().asLiveData()
@@ -16,23 +20,33 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
             itemDao.insert(item)
         }
     }
-    private fun getNewItemEntry(itemName: String, itemPrice: String, itemCount: String): Item {
+    private fun getNewItemEntry(itemName: String, itemPrice: String, itemCount: String, providerName: String, providerEmail: String, providerPhone: String): Item {
         return Item(
             itemName = itemName,
             itemPrice = itemPrice.toDouble(),
-            quantityInStock = itemCount.toInt()
+            quantityInStock = itemCount.toInt(),
+            providerName = providerName,
+            providerEmail = providerEmail,
+            providerPhoneNumber = providerPhone
         )
     }
-    fun addNewItem(itemName: String, itemPrice: String, itemCount: String) {
-        val newItem = getNewItemEntry(itemName, itemPrice, itemCount)
+    fun addNewItem(itemName: String, itemPrice: String, itemCount: String, providerName: String, providerEmail: String, providerPhone: String) {
+        val newItem = getNewItemEntry(itemName, itemPrice, itemCount, providerName, providerEmail, providerPhone)
         insertItem(newItem)
     }
 
-    fun isEntryValid(itemName: String, itemPrice: String, itemCount: String): Boolean {
-        if (itemName.isBlank() || itemPrice.isBlank() || itemCount.isBlank()) {
+    fun isEntryValid(itemName: String, itemPrice: String, itemCount: String, providerName: String, providerEmail: String, providerPhone: String): Boolean {
+        if (itemName.isBlank() || itemPrice.isBlank() || itemCount.isBlank() || providerName.isBlank() || !isValidEmail(providerEmail) || !isValidPhone(providerPhone)) {
             return false
         }
         return true
+    }
+    private fun isValidEmail(target: CharSequence?): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
+
+    private fun isValidPhone(target: CharSequence?): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.PHONE.matcher(target).matches()
     }
 
     fun retrieveItem(id: Int): LiveData<Item> {
@@ -66,14 +80,20 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
         itemId: Int,
         itemName: String,
         itemPrice: String,
-        itemCount: String
+        itemCount: String,
+        providerName: String,
+        providerEmail: String,
+        providerPhone: String
     ): Item {
         val nf = NumberFormat.getInstance()
         return Item(
             id = itemId,
             itemName = itemName,
             itemPrice = nf.parse(itemPrice)!!.toDouble(),
-            quantityInStock = itemCount.toInt()
+            quantityInStock = itemCount.toInt(),
+            providerName = providerName,
+            providerEmail = providerEmail,
+            providerPhoneNumber = providerPhone
         )
     }
 
@@ -81,9 +101,12 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel() {
         itemId: Int,
         itemName: String,
         itemPrice: String,
-        itemCount: String
+        itemCount: String,
+        providerName: String,
+        providerEmail: String,
+        providerPhone: String
     ) {
-        val updatedItem = getUpdatedItemEntry(itemId, itemName, itemPrice, itemCount)
+        val updatedItem = getUpdatedItemEntry(itemId, itemName, itemPrice, itemCount, providerName, providerEmail, providerPhone)
         updateItem(updatedItem)
     }
 }
