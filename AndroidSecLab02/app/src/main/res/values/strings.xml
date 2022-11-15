@@ -41,4 +41,11 @@
     <string name="provider_email_req">Provider Email <font color='#FF0000'>*</font></string>
     <string name="provider_phone_req">Provider Phone <font color='#FF0000'>*</font></string>
     <string name="share">Share</string>
+    <string name="preferences">Preferences</string>
+    <string name="default_provider_name">Default provider name</string>
+    <string name="default_provider_email">Default provider Email</string>
+    <string name="default_provider_phone">Default provider phone</string>
+    <string name="substitute_default_values">Substitute default values</string>
+    <string name="hide_sensitive_data">Hide sensitive data</string>
+    <string name="forbid_data_sharing">Forbid data sharing</string>
 </resources>
