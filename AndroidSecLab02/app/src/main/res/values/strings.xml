@@ -50,4 +50,5 @@
     <string name="forbid_data_sharing">Forbid data sharing</string>
     <string name="save_to_file">Save to file</string>
     <string name="load_item_from_file">Load item from file</string>
+    <string name="item_source">Item source:</string>
 </resources>

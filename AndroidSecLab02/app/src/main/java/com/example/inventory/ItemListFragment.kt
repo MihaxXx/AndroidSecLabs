@@ -98,6 +98,7 @@ class ItemListFragment : Fragment() {
                 // Perform operations on the document using its URI.
                 val json = readTextFromUri(uri)
                 val item = Json.decodeFromString<Item>(json)
+                item.source = "file"
                 viewModel.addNewItem(item)
             }
         }

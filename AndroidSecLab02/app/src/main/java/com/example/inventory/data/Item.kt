@@ -21,7 +21,7 @@ data class Item (
     val providerName: String,
     val providerEmail: String,
     val providerPhoneNumber: String,
-    val source: String = "manual"
+    var source: String = "manual"
 )
 
 fun Item.getFormattedPrice() : String = NumberFormat.getCurrencyInstance().format(itemPrice)

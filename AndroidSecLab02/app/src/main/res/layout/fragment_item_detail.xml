@@ -109,7 +109,6 @@
         android:text="@string/provider_phone"
         app:layout_constraintBaseline_toBaselineOf="@+id/provider_phone"
         app:layout_constraintEnd_toStartOf="@+id/provider_phone"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -123,6 +122,27 @@
         app:layout_constraintTop_toBottomOf="@+id/provider_email"
         tools:text="+1 555 75 35" />
 
+    <TextView
+        android:id="@+id/item_source_label"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="wrap_content"
+        android:text="@string/item_source"
+        app:layout_constraintBaseline_toBaselineOf="@+id/item_source"
+        app:layout_constraintEnd_toStartOf="@+id/item_source"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/item_source"
+        style="@style/Widget.Inventory.TextView"
+        android:layout_width="0dp"
+        android:layout_marginStart="@dimen/margin_between_elements"
+        android:layout_marginTop="@dimen/margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/item_source_label"
+        app:layout_constraintTop_toBottomOf="@+id/provider_phone"
+        tools:text="manual" />
+
     <Button
         android:id="@+id/sell_item"
         android:layout_width="0dp"
@@ -132,7 +152,7 @@
         app:layout_constraintBottom_toTopOf="@+id/delete_item"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/provider_phone" />
+        app:layout_constraintTop_toBottomOf="@+id/item_source" />
 
     <Button
         android:id="@+id/delete_item"

@@ -132,6 +132,7 @@ class ItemDetailFragment : Fragment() {
             itemName.text = item.itemName
             itemPrice.text = item.getFormattedPrice()
             itemCount.text = item.quantityInStock.toString()
+            itemSource.text = item.source
             if (sharedPreferences.getBoolean("switchHideSensitiveData",false)) {
                 providerName.text = blurString(item.providerName)
                 providerEmail.text = blurString(item.providerEmail)
