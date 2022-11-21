@@ -156,6 +156,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/delete_item" />
 
+    <Button
+        android:id="@+id/save_to_file_item"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin"
+        android:text="@string/save_to_file"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/share_item" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/edit_item"
         android:layout_width="wrap_content"

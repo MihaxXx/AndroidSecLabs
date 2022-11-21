@@ -17,9 +17,14 @@
 package com.example.inventory
 
 
+import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,10 +32,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKey
+import androidx.security.crypto.MasterKeys
 import com.example.inventory.data.Item
 import com.example.inventory.data.getFormattedPrice
 import com.example.inventory.databinding.FragmentItemDetailBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
 /**
  * [ItemDetailFragment] displays the details of the selected item.
@@ -132,6 +148,7 @@ class ItemDetailFragment : Fragment() {
             deleteItem.setOnClickListener { showConfirmationDialog() }
             editItem.setOnClickListener { editItem() }
             shareItem.setOnClickListener { share() }
+            saveToFileItem.setOnClickListener { saveToFile() }
         }
     }
     /**
@@ -149,4 +166,64 @@ class ItemDetailFragment : Fragment() {
         sharingIntent.putExtra(Intent.EXTRA_TEXT, itemText)
         startActivity(Intent.createChooser(sharingIntent, null))
     }
+
+    private fun saveToFile(){
+        val json = Json.encodeToString(item)
+        fileContent = json
+        createFile(item.itemName)
+    }
+
+    private fun createFile(filename:String) {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_TITLE, "${filename}.json")
+        }
+        startActivityForResult(intent, Companion.CREATE_FILE)
+    }
+
+    override fun onActivityResult(
+        requestCode: Int, resultCode: Int, resultData: Intent?) {
+        if (requestCode == CREATE_FILE
+            && resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            resultData?.data?.also { uri ->
+                // Perform operations on the document using its URI.
+                alterDocument(uri)
+            }
+        }
+    }
+
+    companion object {
+        // Request code for creating a PDF document.
+        const val CREATE_FILE = 1
+    }
+
+    var fileContent: String = ""
+
+    private fun alterDocument(uri: Uri) {
+        try {
+            requireContext().applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                FileOutputStream(it.fileDescriptor).use {
+                    it.write(fileContent.toByteArray(StandardCharsets.UTF_8))
+                }
+            }
+/*            val mainKey = MasterKey.Builder(requireContext())
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            val encryptedFile = EncryptedFile.Builder(requireContext(), File(uri.path!!),mainKey,EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
+            encryptedFile.openFileOutput().apply {
+                write(fileContent.toByteArray(StandardCharsets.UTF_8))
+                flush()
+                close()
+            }*/
+
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
 }

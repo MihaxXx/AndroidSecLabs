@@ -48,4 +48,6 @@
     <string name="substitute_default_values">Substitute default values</string>
     <string name="hide_sensitive_data">Hide sensitive data</string>
     <string name="forbid_data_sharing">Forbid data sharing</string>
+    <string name="save_to_file">Save to file</string>
+    <string name="load_item_from_file">Load item from file</string>
 </resources>

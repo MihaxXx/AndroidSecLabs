@@ -16,7 +16,11 @@
 
 package com.example.inventory
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +29,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.inventory.databinding.ItemListFragmentBinding
+import com.example.inventory.data.Item
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 /**
  * Main fragment displaying details for all items in the database.
@@ -72,5 +83,56 @@ class ItemListFragment : Fragment() {
             val action = ItemListFragmentDirections.actionItemListFragmentToSettingsFragment()
             this.findNavController().navigate(action)
         }
+        binding.floatingActionButton3.setOnClickListener {
+            readFromFile()
+        }
+    }
+
+    override fun onActivityResult(
+        requestCode: Int, resultCode: Int, resultData: Intent?) {
+        if (requestCode == PICK_JSON_FILE
+            && resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            resultData?.data?.also { uri ->
+                // Perform operations on the document using its URI.
+                val json = readTextFromUri(uri)
+                val item = Json.decodeFromString<Item>(json)
+                viewModel.addNewItem(item)
+            }
+        }
+    }
+
+    private fun readFromFile() {
+        openFile()
+    }
+
+    private fun openFile(){
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+        }
+
+        startActivityForResult(intent, PICK_JSON_FILE)
+    }
+
+    companion object {
+        // Request code for selecting a JSON document.
+        const val PICK_JSON_FILE = 2
+    }
+
+    @Throws(IOException::class)
+    private fun readTextFromUri(uri: Uri): String {
+        val stringBuilder = StringBuilder()
+        requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
+            BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8)).use { reader ->
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    stringBuilder.append(line)
+                    line = reader.readLine()
+                }
+            }
+        }
+        return stringBuilder.toString()
     }
 }
