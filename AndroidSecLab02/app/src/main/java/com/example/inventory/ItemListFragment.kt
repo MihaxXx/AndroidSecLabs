@@ -20,21 +20,21 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.inventory.databinding.ItemListFragmentBinding
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKey
 import com.example.inventory.data.Item
+import com.example.inventory.databinding.ItemListFragmentBinding
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
 import java.nio.charset.StandardCharsets
 
 /**
@@ -84,7 +84,7 @@ class ItemListFragment : Fragment() {
             this.findNavController().navigate(action)
         }
         binding.floatingActionButton3.setOnClickListener {
-            readFromFile()
+            openFile()
         }
     }
 
@@ -96,16 +96,47 @@ class ItemListFragment : Fragment() {
             // the user selected.
             resultData?.data?.also { uri ->
                 // Perform operations on the document using its URI.
-                val json = readTextFromUri(uri)
-                val item = Json.decodeFromString<Item>(json)
-                item.source = "file"
-                viewModel.addNewItem(item)
+                try {
+                    val encryptedContent = readBytesFromUri(uri)
+
+                    val file = File(requireContext().cacheDir, "secret_data")
+                    if (file.exists()) file.delete()
+                    requireContext().contentResolver.openFileDescriptor(file.toUri(), "w")?.use {
+                        FileOutputStream(it.fileDescriptor).use {
+                            it.write(encryptedContent)
+                        }
+                    }
+
+                    val mainKey = MasterKey.Builder(requireContext())
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                        .build()
+                    val encryptedFile = EncryptedFile.Builder(requireContext(),
+                        file,
+                        mainKey,
+                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+                    ).build()
+                    val inputStream = encryptedFile.openFileInput()
+                    val byteArrayOutputStream = ByteArrayOutputStream()
+                    var nextByte: Int = inputStream.read()
+                    while (nextByte != -1) {
+                        byteArrayOutputStream.write(nextByte)
+                        nextByte = inputStream.read()
+                    }
+                    val plaintext = byteArrayOutputStream.toString()
+
+                    val item = Json.decodeFromString<Item>(plaintext)
+                    item.source = "file"
+                    viewModel.addNewItem(item)
+
+                    file.delete()
+
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
         }
-    }
-
-    private fun readFromFile() {
-        openFile()
     }
 
     private fun openFile(){
@@ -135,5 +166,18 @@ class ItemListFragment : Fragment() {
             }
         }
         return stringBuilder.toString()
+    }
+    private fun readBytesFromUri(uri: Uri) : ByteArray{
+        val byteBuffer = ByteArrayOutputStream()
+        requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
+            val bufferSize = 1024
+            val buffer = ByteArray(bufferSize)
+
+            var len = 0
+            while (inputStream.read(buffer).also { len = it } != -1) {
+                byteBuffer.write(buffer, 0, len)
+            }
+        }
+        return byteBuffer.toByteArray()
     }
 }

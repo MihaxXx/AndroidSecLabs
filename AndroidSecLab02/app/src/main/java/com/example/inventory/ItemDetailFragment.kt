@@ -18,35 +18,28 @@ package com.example.inventory
 
 
 import android.app.Activity
-import android.app.Application
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKey
-import androidx.security.crypto.MasterKeys
 import com.example.inventory.data.Item
 import com.example.inventory.data.getFormattedPrice
 import com.example.inventory.databinding.FragmentItemDetailBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.nio.charset.StandardCharsets
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 
 /**
  * [ItemDetailFragment] displays the details of the selected item.
@@ -203,28 +196,53 @@ class ItemDetailFragment : Fragment() {
 
     var fileContent: String = ""
 
+    // Achtung!!! horrible crutch
     private fun alterDocument(uri: Uri) {
         try {
-            requireContext().applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                FileOutputStream(it.fileDescriptor).use {
-                    it.write(fileContent.toByteArray(StandardCharsets.UTF_8))
-                }
-            }
-/*            val mainKey = MasterKey.Builder(requireContext())
+            //Write encrypted temp file to cache dir
+            val file = File(requireContext().cacheDir, "secret_data")
+            if (file.exists()) file.delete()
+            val mainKey = MasterKey.Builder(requireContext())
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
-            val encryptedFile = EncryptedFile.Builder(requireContext(), File(uri.path!!),mainKey,EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
+            val encryptedFile = EncryptedFile.Builder(requireContext(),file ,mainKey,EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
             encryptedFile.openFileOutput().apply {
-                write(fileContent.toByteArray(StandardCharsets.UTF_8))
+                write(fileContent.toByteArray())
                 flush()
                 close()
-            }*/
+            }
+
+            //Read encrypted temp file contents from cache dir
+            val encryptedContents = readBytesFromUri(file.toUri())
+
+            //Write encrypted temp file content to user chosen location
+            requireContext().applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+                FileOutputStream(it.fileDescriptor).use {
+                    it.write(encryptedContents)
+                }
+            }
+
+            //Remove temp file from cache dir
+            file.delete()
 
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+    private fun readBytesFromUri(uri: Uri) : ByteArray{
+        val byteBuffer = ByteArrayOutputStream()
+        requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
+            val bufferSize = 1024
+            val buffer = ByteArray(bufferSize)
+
+            var len = 0
+            while (inputStream.read(buffer).also { len = it } != -1) {
+                byteBuffer.write(buffer, 0, len)
+            }
+        }
+        return byteBuffer.toByteArray()
     }
 
 }
