@@ -81,7 +81,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/load_item_from_file"
-        android:src="@android:drawable/sym_contact_card"
+        android:src="@drawable/ic_baseline_upload_file_24"
         app:layout_constraintBottom_toTopOf="@+id/floatingActionButton2"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white" />
@@ -93,7 +93,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/preferences"
-        android:src="@android:drawable/ic_menu_preferences"
+        android:src="@drawable/outline_settings_24"
         app:layout_constraintBottom_toTopOf="@+id/floatingActionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white" />
