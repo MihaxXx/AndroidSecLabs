@@ -39,7 +39,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.*
-import java.nio.charset.StandardCharsets
 
 /**
  * [ItemDetailFragment] displays the details of the selected item.
@@ -202,25 +201,13 @@ class ItemDetailFragment : Fragment() {
             //Write encrypted temp file to cache dir
             val file = File(requireContext().cacheDir, "secret_data")
             if (file.exists()) file.delete()
-            val mainKey = MasterKey.Builder(requireContext())
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-            val encryptedFile = EncryptedFile.Builder(requireContext(),file ,mainKey,EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB).build()
-            encryptedFile.openFileOutput().apply {
-                write(fileContent.toByteArray())
-                flush()
-                close()
-            }
+            writeBytesToEncryptedFile(file, fileContent.toByteArray())
 
             //Read encrypted temp file contents from cache dir
-            val encryptedContents = readBytesFromUri(file.toUri())
+            val encryptedContents = readBytesFromFile(file)
 
             //Write encrypted temp file content to user chosen location
-            requireContext().applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
-                FileOutputStream(it.fileDescriptor).use {
-                    it.write(encryptedContents)
-                }
-            }
+            writeBytesToUri(uri, encryptedContents)
 
             //Remove temp file from cache dir
             file.delete()
@@ -231,9 +218,35 @@ class ItemDetailFragment : Fragment() {
             e.printStackTrace()
         }
     }
-    private fun readBytesFromUri(uri: Uri) : ByteArray{
+
+    private fun writeBytesToUri(uri: Uri, encryptedContents: ByteArray) {
+        requireContext().applicationContext.contentResolver.openFileDescriptor(uri, "w")?.use {
+            FileOutputStream(it.fileDescriptor).use {
+                it.write(encryptedContents)
+            }
+        }
+    }
+
+    private fun writeBytesToEncryptedFile(file: File, bytes: ByteArray) {
+        val mainKey = MasterKey.Builder(requireContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        val encryptedFile = EncryptedFile.Builder(
+            requireContext(),
+            file,
+            mainKey,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
+        encryptedFile.openFileOutput().apply {
+            write(bytes)
+            flush()
+            close()
+        }
+    }
+
+    private fun readBytesFromFile(file: File) : ByteArray{
         val byteBuffer = ByteArrayOutputStream()
-        requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
+        requireContext().applicationContext.contentResolver.openInputStream(file.toUri())?.use { inputStream ->
             val bufferSize = 1024
             val buffer = ByteArray(bufferSize)
 

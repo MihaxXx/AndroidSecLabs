@@ -87,7 +87,7 @@ class ItemListFragment : Fragment() {
             openFile()
         }
     }
-
+    // Achtung!!! horrible crutch
     override fun onActivityResult(
         requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == PICK_JSON_FILE
@@ -97,34 +97,21 @@ class ItemListFragment : Fragment() {
             resultData?.data?.also { uri ->
                 // Perform operations on the document using its URI.
                 try {
+                    //Read encrypted contents from user selected file
                     val encryptedContent = readBytesFromUri(uri)
 
-                    val file = File(requireContext().cacheDir, "secret_data")
+                    //Create temp file for encryption
+                    val tempFilename = "secret_data"
+                    val file = File(requireContext().cacheDir, tempFilename)
                     if (file.exists()) file.delete()
-                    requireContext().contentResolver.openFileDescriptor(file.toUri(), "w")?.use {
-                        FileOutputStream(it.fileDescriptor).use {
-                            it.write(encryptedContent)
-                        }
-                    }
+                    //Write encrypted contents to temp file
+                    writeBytesToFile(file, encryptedContent)
 
-                    val mainKey = MasterKey.Builder(requireContext())
-                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                        .build()
-                    val encryptedFile = EncryptedFile.Builder(requireContext(),
-                        file,
-                        mainKey,
-                        EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-                    ).build()
-                    val inputStream = encryptedFile.openFileInput()
-                    val byteArrayOutputStream = ByteArrayOutputStream()
-                    var nextByte: Int = inputStream.read()
-                    while (nextByte != -1) {
-                        byteArrayOutputStream.write(nextByte)
-                        nextByte = inputStream.read()
-                    }
-                    val plaintext = byteArrayOutputStream.toString()
+                    //Decrypt contents from temp file
+                    val byteArrayOutputStream = readBytesFromEncryptedFile(file)
 
-                    val item = Json.decodeFromString<Item>(plaintext)
+                    //Convert byteArray of json to object
+                    val item = Json.decodeFromString<Item>(byteArrayOutputStream.toString())
                     item.source = "file"
                     viewModel.addNewItem(item)
 
@@ -135,6 +122,34 @@ class ItemListFragment : Fragment() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
+            }
+        }
+    }
+
+    private fun readBytesFromEncryptedFile(file: File): ByteArrayOutputStream {
+        val mainKey = MasterKey.Builder(requireContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        val encryptedFile = EncryptedFile.Builder(
+            requireContext(),
+            file,
+            mainKey,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
+        val inputStream = encryptedFile.openFileInput()
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        var nextByte: Int = inputStream.read()
+        while (nextByte != -1) {
+            byteArrayOutputStream.write(nextByte)
+            nextByte = inputStream.read()
+        }
+        return byteArrayOutputStream
+    }
+
+    private fun writeBytesToFile(file: File, encryptedContent: ByteArray) {
+        requireContext().contentResolver.openFileDescriptor(file.toUri(), "w")?.use {
+            FileOutputStream(it.fileDescriptor).use {
+                it.write(encryptedContent)
             }
         }
     }
@@ -167,6 +182,7 @@ class ItemListFragment : Fragment() {
         }
         return stringBuilder.toString()
     }
+
     private fun readBytesFromUri(uri: Uri) : ByteArray{
         val byteBuffer = ByteArrayOutputStream()
         requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
