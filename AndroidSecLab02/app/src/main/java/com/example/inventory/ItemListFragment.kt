@@ -35,7 +35,6 @@ import com.example.inventory.databinding.ItemListFragmentBinding
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.*
-import java.nio.charset.StandardCharsets
 
 /**
  * Main fragment displaying details for all items in the database.
@@ -168,28 +167,13 @@ class ItemListFragment : Fragment() {
         const val PICK_JSON_FILE = 2
     }
 
-    @Throws(IOException::class)
-    private fun readTextFromUri(uri: Uri): String {
-        val stringBuilder = StringBuilder()
-        requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
-            BufferedReader(InputStreamReader(inputStream, StandardCharsets.UTF_8)).use { reader ->
-                var line: String? = reader.readLine()
-                while (line != null) {
-                    stringBuilder.append(line)
-                    line = reader.readLine()
-                }
-            }
-        }
-        return stringBuilder.toString()
-    }
-
     private fun readBytesFromUri(uri: Uri) : ByteArray{
         val byteBuffer = ByteArrayOutputStream()
         requireContext().applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
             val bufferSize = 1024
             val buffer = ByteArray(bufferSize)
 
-            var len = 0
+            var len: Int
             while (inputStream.read(buffer).also { len = it } != -1) {
                 byteBuffer.write(buffer, 0, len)
             }

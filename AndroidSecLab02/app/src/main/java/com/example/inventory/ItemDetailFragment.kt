@@ -56,7 +56,7 @@ class ItemDetailFragment : Fragment() {
 
     lateinit var item: Item
 
-    lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -172,7 +172,7 @@ class ItemDetailFragment : Fragment() {
             type = "application/json"
             putExtra(Intent.EXTRA_TITLE, "${filename}.json")
         }
-        startActivityForResult(intent, Companion.CREATE_FILE)
+        startActivityForResult(intent, CREATE_FILE)
     }
 
     override fun onActivityResult(
@@ -193,7 +193,7 @@ class ItemDetailFragment : Fragment() {
         const val CREATE_FILE = 1
     }
 
-    var fileContent: String = ""
+    private var fileContent: String = ""
 
     // Achtung!!! horrible crutch
     private fun alterDocument(uri: Uri) {
@@ -250,7 +250,7 @@ class ItemDetailFragment : Fragment() {
             val bufferSize = 1024
             val buffer = ByteArray(bufferSize)
 
-            var len = 0
+            var len: Int
             while (inputStream.read(buffer).also { len = it } != -1) {
                 byteBuffer.write(buffer, 0, len)
             }
