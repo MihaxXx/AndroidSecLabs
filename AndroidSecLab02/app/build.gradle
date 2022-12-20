@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.inventory"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
@@ -79,4 +79,7 @@ dependencies {
     implementation "androidx.security:security-crypto:1.1.0-alpha04"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+
+    implementation "net.zetetic:android-database-sqlcipher:4.5.2"
+    implementation "androidx.sqlite:sqlite:2.0.1"
 }
