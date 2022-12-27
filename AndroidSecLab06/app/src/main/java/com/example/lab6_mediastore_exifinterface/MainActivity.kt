@@ -24,11 +24,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.lab6_mediastore_exifinterface.data.*
 import com.example.lab6_mediastore_exifinterface.databinding.ActivityMainBinding
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.*
 
@@ -55,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onUploadClick() {
-        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+       val gallery = Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
         startActivityForResult(gallery, pickImage)
     }
 
