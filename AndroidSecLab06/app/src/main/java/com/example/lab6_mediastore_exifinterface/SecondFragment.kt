@@ -71,8 +71,8 @@ class SecondFragment : Fragment() {
         newExifData.device = binding.editDevice.text.toString()
         var newGeo: Geo? = null
         if (binding.editLatitude.text.isNotEmpty() && binding.editLongitude.text.isNotEmpty()) {
-            val lat = binding.editLatitude.text.toString().toDoubleOrNull()
-            val long = binding.editLongitude.text.toString().toDoubleOrNull()
+            val lat = binding.editLatitude.text.toString().replace(',','.').toDoubleOrNull()
+            val long = binding.editLongitude.text.toString().replace(',','.').toDoubleOrNull()
             if (lat == null || long == null) {
                 Snackbar.make(view, "Invalid latitude and/or longitude", Snackbar.LENGTH_LONG)
                     .show()
